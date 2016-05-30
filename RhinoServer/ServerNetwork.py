@@ -9,9 +9,6 @@ import time,os,socket,Data,SocketServer,logging
 
 class RhinoServers(SocketServer.StreamRequestHandler):
     logger = logging.getLogger('RhinoServers')
-    name="noname"
-    ID=-1
-    password=""
     def handle(self):
         Data.CONNECTIONS.append(self);
         print 'got connection from ',self.client_address

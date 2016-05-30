@@ -5,26 +5,6 @@ reload(sys)
 sys.setdefaultencoding( "utf-8" )
 import logging,os
 
-
-SERVER=None
-SERVER_NAME="RhinoServer"
-VERSION=1.0
-Version=VERSION
-
-CONNECTIONS=[]
-
-USERS=[]
-
-class User():
-    name="USER_NAME"
-    ID=-1
-    histroy="x"
-
-    __userName=""
-    __password=""
-
-
-
 LOG_FILE_PATH=SERVER_NAME+".log"
 LOG_FILE_WRITE_MODE="r"
 if os.path.isfile(LOG_FILE_PATH):
@@ -61,3 +41,45 @@ console.setLevel(logging.INFO)
 formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
+
+SERVER=None
+SERVER_NAME="RhinoServer"
+VERSION=1.0
+Version=VERSION
+
+CONNECTIONS=[]
+USERS=[]
+REGISTER_USERS=[]
+ONLINE_USER=[]
+
+class User():
+    ID=-1
+    name="USER_NAME"
+    __password="fengx"
+
+    online=False
+
+    SRH=None
+
+    histroy="x"
+
+    logger = logging.getLogger('RhinoServers')
+    def setUserName(self,n):
+        self.userName==n
+    def setPassword(self,p):
+        self.__password==n
+    def sendMsg(self,msg):
+        if SRH!=None:
+            logger.warning("cant send msg , is not connectting")
+def createNewUser(name):
+    u=User()
+    u.name=name
+    return u
+
+# def getUserByName(name):
+#     for u in REGISTER_USERS:
+#         if u.name==name:
+#
+
+
+#---
