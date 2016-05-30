@@ -1,5 +1,7 @@
 # Data.py
-import wx,os
+# -*- coding: utf-8 -*-
+import sys,time,random,logging,wx,os
+reload(sys)
 
 MAIN_APP=None
 MAIN_FRAME=None
@@ -24,8 +26,6 @@ PI=3.14159
 SPEED=2
 rSPEED=-0.01
 
-
-
 GL_COLOR_viewPort_BG=(0.40,0.40,0.40,0)
 GL_COLOR_gridLine=(0.35,0.35,0.35,0)
 
@@ -39,3 +39,15 @@ UI_COLOR_sceneTree_BG=(140,140,140)
 UI_COLOR_sceneTree_FG=(50,50,50)
 UI_COLOR_mainToolbar_BG=(130,130,130)
 UI_COLOR_mainToolbar_FG=(67,67,67)
+
+
+logging.basicConfig(level=logging.DEBUG,
+                format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
+                datefmt='%a, %d %b %Y %H:%M:%S',
+                filename=LOG_FILE_PATH,
+                filemode=LOG_FILE_WRITE_MODE)
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+console.setFormatter(formatter)
+logging.getLogger('').addHandler(console)

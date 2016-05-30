@@ -1,4 +1,7 @@
 # mainApp.py
+# -*- coding: utf-8 -*-
+import sys,time,random
+reload(sys)
 import GUI,Data
 
 if __name__=='__main__':

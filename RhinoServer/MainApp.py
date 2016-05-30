@@ -1,12 +1,15 @@
 # mainApp.py
+# -*- coding: utf-8 -*-
+import sys,time,random
+reload(sys)
+sys.setdefaultencoding( "utf-8" )
 import Data,ServerNetwork,sys,socket,logging
-
 
 
 if __name__ == '__main__':
     logger = Data.logging.getLogger('MAIN_APP')
     #print Data.SERVER_NAME," ",Data.VERSION," initialization is starting....."
-    logger.debug("\n========================================\n"*3+Data.SERVER_NAME+" "+str(Data.VERSION)+" initialization is starting.....")
+    logger.info(Data.SERVER_NAME+" "+str(Data.VERSION)+" initialization is starting.....    ========================================  ")
     host=""
     port = 9999
     addr = (host,port)
@@ -23,5 +26,5 @@ if __name__ == '__main__':
         host= socket.gethostbyname(socket.gethostname())
     Data.SERVER=ServerNetwork.createServer(host,port)
     #print Data.SERVER_NAME,' is servering on addr:',host,'port:',port
-    logger.debug(Data.SERVER_NAME+' is servering on addr: '+host+' port: '+str(port))
+    logger.info(Data.SERVER_NAME+' is servering on addr: '+host+' port: '+str(port))
     Data.SERVER.serve_forever()

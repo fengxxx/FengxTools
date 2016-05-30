@@ -10,6 +10,7 @@ import time,os,socket,Data,SocketServer,logging
 class RhinoServers(SocketServer.StreamRequestHandler):
     logger = logging.getLogger('RhinoServers')
     name="noname"
+    ID=-1
     password=""
     def handle(self):
         Data.CONNECTIONS.append(self);
@@ -42,23 +43,6 @@ class RhinoServers(SocketServer.StreamRequestHandler):
                         self.name=ds[1]
                         loginMsg=('wellcome  <%s> %s:%s at %s add chat room!' % (self.name,self.client_address[0],self.client_address[1],time.ctime()))
                         self.broadcastMesg(loginMsg)
-
-    def getName(self):
-        self.sendMesge((self.name+":"+self.password))
-
-    def sendFile(self,filePath):
-        #print "sendFile"
-        if os.path.isfile(filePath):
-            self.request.send(DATA_FILE_START)
-            f=open(filePath,"rb")
-            self.request.send(f.read())
-            f.close()
-            time.sleep(0.5)
-            self.request.send(DATA_FILE_END)
-            return True
-        else:
-            self.sendError("file is not exit!")
-            return False
 
     def broadcastMesg(self,msg):
         print ("broadcastMesg: ",msg)
