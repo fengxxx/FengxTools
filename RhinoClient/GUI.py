@@ -48,7 +48,7 @@ class ChatFrame ( wx.Frame ):
         self.Layout()
         self.Centre( wx.BOTH )
         #pub.subscribe(self.recvMsg, "recvMsg")
-        pub.subscribe(self.recvMsgFromServer, "recvMsgToServer")
+        pub.subscribe(self.recvMsgFromServer, "getMsg")
     def OnClick_send(self,event):
         #wx.CallAfter(pub.sendMessage , "test", msg=self.tex_input.GetValue())
         if self.tex_input.GetValue()!="":
@@ -56,8 +56,6 @@ class ChatFrame ( wx.Frame ):
             self.tex_input.SetValue("")
     def recvMsgFromServer(self,m):
         self.tex_show.WriteText("\n"+m)
-    def regist(self,msg):
-        wx.CallAfter(pub.sendMessage , "sendMsgToServer", msg="regist|"+self.tex_input.GetValue())
     def OnKeyDown(self,event):
         keycode = event.GetKeyCode()
         ctrldown = event.ControlDown()
@@ -70,6 +68,7 @@ class ChatFrame ( wx.Frame ):
 
 class LoginFrame ( wx.Frame ):
     host="minecraftfengx.wicp.net"
+    host="localhost"
     port=9999
     names=("州","猪","小明","小亮","鱼","Rhino","Fengx","服务器_1","菠菜","土豆","外星人")
     def __init__( self, parent ):
@@ -83,19 +82,31 @@ class LoginFrame ( wx.Frame ):
         self.tex_input.SetPosition((25,25))
         self.tex_host.SetPosition((25,70))
         self.but_send = wx.Button(self, 10, "登陆")
-        self.but_send.SetPosition((25,230))
+        self.but_send_www = wx.Button(self, 10, "myServer")
+        self.but_send_local = wx.Button(self, 10, "localhost")
+        self.but_send_local.SetPosition((25,230))
+        self.but_send_www.SetPosition((25,260))
+        self.but_send.SetPosition((25,290))
         self.but_send.SetSize((200,180))
         self.but_send.Bind(wx.EVT_BUTTON, self.regist)
+        self.but_send_local.Bind(wx.EVT_BUTTON, self.setHost_local)
+        self.but_send_www.Bind(wx.EVT_BUTTON, self.setHost_www)
         Sizer_main = wx.BoxSizer( wx.VERTICAL )
     def regist(self,msg):
         global mainWindow
         self.host=self.tex_host.GetValue()
         c=ClientNetwork.createClient(self.host,self.port)
         c.start()
-        wx.CallAfter(pub.sendMessage , "sendMsgToServer", msg="regist|"+self.tex_input.GetValue())
+        #wx.CallAfter(pub.sendMessage , "sendMsgToServer", msg="regist|"+self.tex_input.GetValue())
+        wx.CallAfter(pub.sendMessage , "regist", name=self.tex_input.GetValue(),password="123")
         self.Show(False)
         Data.MAIN_FRAME.Show()
-
+    def login(self):
+        wx.CallAfter(pub.sendMessage , "login", name=self.tex_input.GetValue(),password="123")
+    def setHost_local(self,event):
+        self.tex_host.SetValue(Data.LOCALHOST)
+    def setHost_www(self,event):
+        self.tex_host.SetValue("minecraftfengx.wicp.net")
 class MainFrame ( wx.Frame ):
     lastPos=[0,0]
     canMove=False

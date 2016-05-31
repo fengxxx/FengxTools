@@ -19,12 +19,11 @@ NEXT_USER_ID=0 #_save
 # network defien
 CMD_SPLIT="|"
 class CMD_NETWORK_HAND():
-    verify="verify",
-    say="say",
-    regist="regist",
-    login="regist"
+    verify="verify"
+    say="say"
+    regist="regist"
+    login="login"
     msg="msg"
-
 
 #--filePath
 PATH_SETTINGS="config.xml"
@@ -69,20 +68,18 @@ logging.getLogger('').addHandler(console)
 logger = logging.getLogger(SERVER_NAME)
 
 class User():
-    def __init__( self):
-        global NEXT_USER_ID
-        NEXT_USER_ID+=1
     ID=-1
     name="USER_NAME"
     __password="fengx"
-
     online=False
-
     SRH=None
-
     histroy="x"
-
     logger = logging.getLogger('RhinoServers')
+    def __init__( self):
+        global NEXT_USER_ID
+        NEXT_USER_ID+=1
+    def __new__(self,*args, **kwargs):
+        NEXT_USER_ID+=1
     def setUserName(self,n):
         self.userName==n
     def setPassword(self,p):
@@ -133,6 +130,7 @@ def login(name,password):
     suc=False
     msg="bad userName or password"
     u=getUserByName(name)
+    print u
     if u!=None:
         if u.isPassword(password):
             msg="login succed!"
@@ -152,6 +150,9 @@ def regist(name,password):
         regMsg="the userName is exist!"
     return suc,u,regMsg
 
+@classmethod
+def test():
+    print "@classmethod"
 
 def getUsersDataFromFile(filePath):
     ()

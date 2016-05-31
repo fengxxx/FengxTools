@@ -3,7 +3,7 @@
 import sys
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
-import socket,os,time,sys,wx
+import socket,os,time,sys,Data,wx
 from threading import Thread
 from wx.lib.pubsub import pub
 
@@ -27,7 +27,8 @@ class Client():
         print ">>conect to : ",self.HOST,":",self.PORT
         pub.subscribe(self.sendMsgToServer, "sendMsgToServer")
         pub.subscribe(self.login, "login")
-        pub.subscribe(self.login, "regist")
+        pub.subscribe(self.regist, "regist")
+        pub.subscribe(self.sayWord, "sayWord")
     def run(self):
         while True:
             data=self.TCP_Sock.recv(1024)
@@ -37,33 +38,40 @@ class Client():
         t=msg
         self.TCP_Sock.send(t)
         print "send:",t
+    def sayWord(self,msg):
+        msg=CMDN.say+CMD_SPLIT+msg
+        self.TCP_Sock.send(msg)
+        print msg
     def onNetworkRecv(self,data):
         #on first hand
         CMDN=Data.CMD_NETWORK_HAND()
-        #wx.CallAfter(pub.sendMessage , "recvMsgToServer", m=data)
         print "recv:",data
         if data!="" and data!=None:
-            ds=data.split(commandSplit)
-            if ds.count>1:
+            ds=data.split(Data.CMD_SPLIT)
+            if len(ds)>1:
                 if not self.isLogin:
                     if ds[0]==CMDN.verify:
-
-                        self.canVerify=True
-                        print "server:",ds[1]
+                        print "ds",ds
+                        if len(ds)>1:
+                            self.isLogin=True
+                            print "server:",ds[1]
                 else:
                     if ds[0]==CMDN.say:
-                        if ds.count==2:
-                            #self.broadcastMsg(self.user,ds[1])
-                            ()
+                        if len(ds)==2:
+                            wx.CallAfter(pub.sendMessage , "getMsg",m=ds[1])
                         else:
                             print "say what?"
                     else:
                         ()#...
-
-    def login():
-        ()
-    def regist():
-        ()
+    def login(self,name,password):
+        cmd=self.CMDN.login+Data.CMD_SPLIT+name+Data.CMD_SPLIT+password
+        self.TCP_Sock.send(cmd)
+    def regist(self,name,password):
+        cmd=self.CMDN.regist+Data.CMD_SPLIT+name+Data.CMD_SPLIT+password
+        self.TCP_Sock.send(cmd)
+    # def sendCMD(self,cmdType,):
+    #     cmd=
+    #     self.request.send()
 class ClientThread(Thread):
     host= socket.gethostbyname(socket.gethostname())
     port=9999

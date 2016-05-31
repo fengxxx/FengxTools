@@ -1,7 +1,10 @@
 # Data.py
 # -*- coding: utf-8 -*-
-import sys,time,random,logging,wx,os
+import sys,time,random,logging,wx,os,socket
 reload(sys)
+
+
+LOCALHOST=socket.gethostbyname(socket.gethostname())
 
 MAIN_APP=None
 MAIN_FRAME=None
@@ -43,12 +46,18 @@ UI_COLOR_mainToolbar_FG=(67,67,67)
 # network defien
 CMD_SPLIT="|"
 class CMD_NETWORK_HAND():
-    verify="verify",
-    say="say",
-    regist="regist",
-    login="regist"
+    verify="verify"
+    say="say"
+    regist="regist"
+    login="login"
     msg="msg"
 
+LOG_FILE_PATH="RhinoClient.log"
+LOG_FILE_WRITE_MODE="r"
+if os.path.isfile(LOG_FILE_PATH):
+    LOG_FILE_WRITE_MODE="a"
+else:
+    LOG_FILE_WRITE_MODE="wb"
 
 logging.basicConfig(level=logging.DEBUG,
                 format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
@@ -60,3 +69,8 @@ console.setLevel(logging.INFO)
 formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
+
+
+print socket.getfqdn()
+print socket.gethostname()
+print socket.gethostbyname(socket.getfqdn())

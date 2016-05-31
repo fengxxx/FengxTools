@@ -16,15 +16,16 @@ class RhinoServers(SocketServer.StreamRequestHandler):
     CMD_Split=Data.CMD_SPLIT
     CMDN=Data.CMD_NETWORK_HAND()
     def handle(self):
-        self.onConnectStart()
+        self.onConnecttionStart()
         while True:
             data=""
             try:
-                data = self.request.recv(recvByteSize)
+                data = self.request.recv(self.recvByteSize)
             except:
-                logger.warning('dont know what')
+                ()
+                #self.logger.warning('dont know what')
             if not data:
-                self.onNetworkBreak()
+                ()#self.onConnectionBreak()
             else:
                 self.onNetworkRecv(data)
 
@@ -34,28 +35,49 @@ class RhinoServers(SocketServer.StreamRequestHandler):
         CMDN=Data.CMD_NETWORK_HAND()
         print "recv:",data
         if data!="" and data!=None:
-            ds=data.split(commandSplit)
-            if ds.count>1:
+            ds=data.split(Data.CMD_SPLIT)
+            if len(ds)>1:
                 if not self.isRegist:
                     if ds[0]==CMDN.login:
                         loginMsg=""
-                        if ds.count==3:
+                        suc=False
+                        u=None
+                        print ds[1],ds[2]
+                        print Data.login(ds[1],ds[2])
+                        try:
                             suc,u,loginMsg=Data.login(ds[1],ds[2])
-                            if suc:
-                                self.user=u
+                            print "suc,u,loginMsg",suc,u,loginMsg
+                        except Exception as e:
+                            print e
+                            loginMsg="get bad login value"
+                        print suc
+                        if suc:
+                            self.user=u
+                            self.isRegist=True
+                            self.sendMsg(CMDN.verify,loginMsg)
+                            self.sendMsg(CMDN.msg,loginMsg)
                         else:
                             self.sendMsg(CMDN.msg,loginMsg)
                     elif ds[0]==CMDN.regist:
                         regMsg=""
-                        if ds.count==3:
+                        suc=False
+                        u=None
+                        try:
                             suc,u,regMsg=Data.regist(ds[1],ds[2])
-                            if suc:
-                                self.user=u
+                            print "suc,u,regMsg",suc,u,regMsg
+                        except Exception as e:
+                            print e
+                        if suc:
+                            self.user=u
+                            self.isRegist=True
+                            self.sendMsg(CMDN.verify,regMsg)
+                            self.sendMsg(CMDN.msg,regMsg)
                         else:
-                            self.sendMsg(CMDN.msg,"")
+                            self.sendMsg(CMDN.msg,regMsg)
                 else:
                     if ds[0]==CMDN.say:
-                        if ds.count==2:
+                        if len(ds)==2:
+                            print "broadcastMsg",ds[1]
                             self.broadcastMsg(self.user,ds[1])
                         else:
                             print "say what?"
@@ -63,37 +85,47 @@ class RhinoServers(SocketServer.StreamRequestHandler):
                         ()#...
     # on connection break
     def onConnectionBreak(self):
-        print self.name," is leav!"
-        loginMsg=('<%s> %s:%s at %s was leaved the chat room!' % (self.name,self.client_address[0],self.client_address[1],time.ctime()))
-        self.broadcastCMD(loginMsg)
-        Data.CONNECTIONS.remove (self);
+        if not self.isRegist or self.user==None:
+            print self.request," is leav!"
+        else:
+            print self.user.name," is leav!"
+        #loginMsg=('<%s> %s:%s at %s was leaved the chat room!' % (self.name,self.client_address[0],self.client_address[1],time.ctime()))
+        self.broadcastCMD(None,"someone is leav")
+        try:
+            Data.CONNECTIONS.remove (self);
+        except Exception as e:
+            print e
 
     # on connection start
     def onConnecttionStart(self):
         Data.CONNECTIONS.append(self);
         #print 'got connection from ',self.client_address
-        logger.DEBUG('got connection from ',self.client_address)
+        self.logger.debug('got connection from ',self.client_address)
         self.onVerify()
     def onVerify(self):
-        self.request.send(CMDN.verify+commandSplit+"who are you!")
+        cmd=self.CMDN.verify+self.CMD_Split+"who are you!"
+        self.request.send(cmd)
         self.isWaite=True
 
     def broadcastCMD(self,user,msg):
         for s in Data.CONNECTIONS:
             try:
-                self.sendMsg(CMDN.msg,msg)
+                s.request.send(self.CMDN.say+Data.CMD_SPLIT+msg)
+                print (self.CMDN.say+Data.CMD_SPLIT+msg)
             except Exception as e:
                 print "lost men:",e
     def broadcastMsg(self,user,msg):
         for s in Data.CONNECTIONS:
             try:
-                self.sendMsg(CMDN.msg,msg)
+                s.request.send(self.CMDN.say+Data.CMD_SPLIT+s.user.name+":"+msg)
+                print (self.CMDN.say+Data.CMD_SPLIT+msg)
             except Exception as e:
                 print "lost men:",e
 
     def sendMsg(self,msgType,msg):
         CMD_Split=Data.CMD_SPLIT
-        self.request.sendMsg(msgType+CMD_Split+msg)
+        print msgType,msg
+        self.request.send(msgType+CMD_Split+msg)
 
     def sendMsgToUser(self,user,msg):
         ()#self.request.sendMsg(msgType+CMD_Split+msg)
