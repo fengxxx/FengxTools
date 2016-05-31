@@ -40,6 +40,15 @@ UI_COLOR_sceneTree_FG=(50,50,50)
 UI_COLOR_mainToolbar_BG=(130,130,130)
 UI_COLOR_mainToolbar_FG=(67,67,67)
 
+# network defien
+CMD_SPLIT="|"
+class CMD_NETWORK_HAND():
+    verify="verify",
+    say="say",
+    regist="regist",
+    login="regist"
+    msg="msg"
+
 
 logging.basicConfig(level=logging.DEBUG,
                 format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',

@@ -5,7 +5,32 @@ reload(sys)
 sys.setdefaultencoding( "utf-8" )
 import logging,os
 
+# main value
+SERVER=None
+SERVER_NAME="RhinoServer" #_save
+VERSION=1.0 #_save
+Version=VERSION
+CONNECTIONS=[]
+#USERS=[]
+REGISTER_USERS=[] #_save
+ONLINE_USER=[]
+NEXT_USER_ID=0 #_save
+
+# network defien
+CMD_SPLIT="|"
+class CMD_NETWORK_HAND():
+    verify="verify",
+    say="say",
+    regist="regist",
+    login="regist"
+    msg="msg"
+
+
+#--filePath
+PATH_SETTINGS="config.xml"
+PATH_REGISTER_USERS="register_users.xml"
 LOG_FILE_PATH=SERVER_NAME+".log"
+
 LOG_FILE_WRITE_MODE="r"
 if os.path.isfile(LOG_FILE_PATH):
     LOG_FILE_WRITE_MODE="a"
@@ -41,18 +66,12 @@ console.setLevel(logging.INFO)
 formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
-
-SERVER=None
-SERVER_NAME="RhinoServer"
-VERSION=1.0
-Version=VERSION
-
-CONNECTIONS=[]
-USERS=[]
-REGISTER_USERS=[]
-ONLINE_USER=[]
+logger = logging.getLogger(SERVER_NAME)
 
 class User():
+    def __init__( self):
+        global NEXT_USER_ID
+        NEXT_USER_ID+=1
     ID=-1
     name="USER_NAME"
     __password="fengx"
@@ -71,15 +90,83 @@ class User():
     def sendMsg(self,msg):
         if SRH!=None:
             logger.warning("cant send msg , is not connectting")
+    def isPassword(psw):
+        res=False
+        if psw==__password:
+            res=True
+        return res
 def createNewUser(name):
     u=User()
     u.name=name
     return u
 
-# def getUserByName(name):
-#     for u in REGISTER_USERS:
-#         if u.name==name:
-#
+def getUserByName(name):
+    user=None
+    for u in REGISTER_USERS:
+        if u.name==name:
+            user=u
+    if user==None:
+        logger.debug("cant find the user!")
+    return user
+
+def getUserByID(userID):
+    user=None
+    for u in REGISTER_USERS:
+        if u.ID==userID:
+            user=u
+    if user==None:
+        logger.debug("cant find the user! with ID:"+str(userID))
+    return user
+
+def getUsersByName(name):
+    users=[]
+    for u in REGISTER_USERS:
+        if u.name==name:
+            users.append(u)
+    if len(user)==0:
+        logger.debug("cant find the user!")
+    return users
 
 
-#---
+
+def login(name,password):
+    suc=False
+    msg="bad userName or password"
+    u=getUserByName(name)
+    if u!=None:
+        if u.isPassword(password):
+            msg="login succed!"
+            suc=True
+    return suc,u,msg
+def regist(name,password):
+    regMsg=""
+    suc=False
+    u=getUserByName(name)
+    if u==None:
+        u=createNewUser(name)
+        u.setPassword=password
+        REGISTER_USERS.append(u)
+        regMsg="regist succed!"
+        suc=True
+    else:
+        regMsg="the userName is exist!"
+    return suc,u,regMsg
+
+
+def getUsersDataFromFile(filePath):
+    ()
+
+def savaUsersDataFromFile(filePath):
+    ()
+
+def getSettingsFromFile(filePath):
+    ()
+
+def savaSettingsToFile(filePath):
+    ()
+
+if __name__ == '__main__':
+    for i in xrange(0,20):
+        REGISTER_USERS.append(createNewUser(str(i)))
+    for u in REGISTER_USERS:
+        print u.name,u.ID

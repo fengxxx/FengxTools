@@ -12,6 +12,11 @@ class Client():
     if HOST=="":
         HOST='localhost'
     PORT=9999
+    CMD_Split=Data.CMD_SPLIT
+    CMDN=Data.CMD_NETWORK_HAND()
+    isRegist=False
+    isLogin=False
+    canVerify=False
     def __init__(self,host,port):
         self.HOST=host
         self.PORT=port
@@ -21,25 +26,44 @@ class Client():
         name=""
         print ">>conect to : ",self.HOST,":",self.PORT
         pub.subscribe(self.sendMsgToServer, "sendMsgToServer")
+        pub.subscribe(self.login, "login")
+        pub.subscribe(self.login, "regist")
     def run(self):
         while True:
             data=self.TCP_Sock.recv(1024)
             if data!="" and data!=None:
-                wx.CallAfter(pub.sendMessage , "recvMsgToServer", m=data)
-                # if data!="" and data!=None:
-                #     ds=data.split("|")
-                #     if ds.count>1:
-                #         if ds[0]=="say":
-                #             self.broadcastMesg(self.name+":"+ds[1])
-                #         elif ds[0]=="regist":
-                #             self.name=ds[1]
-                #             loginMsg=('wellcome  <%s> %s:%s at %s add chat room!' % (self.name,self.client_address[0],self.client_address[1],time.ctime()))
-                #             self.broadcastMesg(loginMsg)
+                self.onNetworkRecv(data)
     def sendMsgToServer(self,msg):
         t=msg
         self.TCP_Sock.send(t)
         print "send:",t
+    def onNetworkRecv(self,data):
+        #on first hand
+        CMDN=Data.CMD_NETWORK_HAND()
+        #wx.CallAfter(pub.sendMessage , "recvMsgToServer", m=data)
+        print "recv:",data
+        if data!="" and data!=None:
+            ds=data.split(commandSplit)
+            if ds.count>1:
+                if not self.isLogin:
+                    if ds[0]==CMDN.verify:
 
+                        self.canVerify=True
+                        print "server:",ds[1]
+                else:
+                    if ds[0]==CMDN.say:
+                        if ds.count==2:
+                            #self.broadcastMsg(self.user,ds[1])
+                            ()
+                        else:
+                            print "say what?"
+                    else:
+                        ()#...
+
+    def login():
+        ()
+    def regist():
+        ()
 class ClientThread(Thread):
     host= socket.gethostbyname(socket.gethostname())
     port=9999
