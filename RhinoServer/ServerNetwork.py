@@ -15,6 +15,7 @@ class RhinoServers(SocketServer.StreamRequestHandler):
     isWaite=False
     CMD_Split=Data.CMD_SPLIT
     CMDN=Data.CMD_NETWORK_HAND()
+    strData={}
     def handle(self):
         self.onConnecttionStart()
         while True:
@@ -72,6 +73,9 @@ class RhinoServers(SocketServer.StreamRequestHandler):
                             self.isRegist=True
                             self.sendMsg(CMDN.verify,regMsg)
                             self.sendMsg(CMDN.msg,regMsg)
+                            for s in Data.REGISTER_USERS:
+                                self.sendFrendToUser(s)
+
                         else:
                             self.sendMsg(CMDN.msg,regMsg)
                 else:
@@ -81,6 +85,16 @@ class RhinoServers(SocketServer.StreamRequestHandler):
                             self.broadcastMsg(self.user,ds[1])
                         else:
                             print "say what?"
+                    elif ds[0]==CMDN.fileStart:
+                        if len(ds)==2:
+                            self.recvByteSize=ds[1]
+                        else:
+                            print "say what?"
+                    elif ds[0]==CMDN.fileEnd:
+                        if len(ds)==3:
+                            self.strData[ds[1]]=ds[2]
+                            self.recvByteSize=1025
+                            print self.strData[ds[1]]
                     else:
                         ()#...
     # on connection break
@@ -117,7 +131,7 @@ class RhinoServers(SocketServer.StreamRequestHandler):
     def broadcastMsg(self,user,msg):
         for s in Data.CONNECTIONS:
             try:
-                s.request.send(self.CMDN.say+Data.CMD_SPLIT+s.user.name+":"+msg)
+                s.request.send(self.CMDN.say+Data.CMD_SPLIT+user.name+":"+msg)
                 print (self.CMDN.say+Data.CMD_SPLIT+msg)
             except Exception as e:
                 print "lost men:",e
@@ -126,6 +140,18 @@ class RhinoServers(SocketServer.StreamRequestHandler):
         CMD_Split=Data.CMD_SPLIT
         print msgType,msg
         self.request.send(msgType+CMD_Split+msg)
+    def sendFrendToUser(self,frende):
+        msg=frende.toJson()
+        msg=self.CMDN.fileEnd+self.CMD_Split+"addUser"+self.CMD_Split+msg
+        l = len(msg)
+        utf8_length = len(msg.encode('utf-8'))
+        l = (utf8_length - l)/2 + l
+        self.request.send(self.CMDN.fileStart+Data.CMD_SPLIT+str(l))
+        self.request.send(msg)
+        self.request.send(self.CMDN.addUser+self.CMD_Split+"add a user")
+        print "leng",l
+        print "send user:",msg
+
 
     def sendMsgToUser(self,user,msg):
         ()#self.request.sendMsg(msgType+CMD_Split+msg)

@@ -1,6 +1,6 @@
 # Data.py
 # -*- coding: utf-8 -*-
-import sys,time,random,logging,wx,os,socket
+import sys,time,random,logging,wx,os,socket,json
 reload(sys)
 
 
@@ -51,6 +51,13 @@ class CMD_NETWORK_HAND():
     regist="regist"
     login="login"
     msg="msg"
+    fileStart="fileStart"
+    fileEnd="fileEnd"
+    addUser="addUser"
+
+FRENDES=[]
+
+
 
 LOG_FILE_PATH="RhinoClient.log"
 LOG_FILE_WRITE_MODE="r"
@@ -70,7 +77,67 @@ formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
 
+class User():
+    ''' user info!!!'''
+    ID=-1
+    name=u"USER_NAME"
+    #__password="fengx"
+    online=False
+    #SRH=None
+    histroy="x"
+    logger = logging.getLogger('RhinoClient')
+    def __init__( self):
+        ()
+    def __dict__(self):
+        return {"ID":self.ID,"sdasd":histroy}
+    def __str__(self):
+        return "sdasfmalskfmlas"
+    def toJson(self):
+        d=[{u'name':self.name,u'ID':self.ID,u'online':self.online}]
+        return d
+def createNewUser(name,ID,online):
+    u=User()
+    u.name=name
+    u.online=online
+    u.ID=ID
+    return u
 
-print socket.getfqdn()
-print socket.gethostname()
-print socket.gethostbyname(socket.getfqdn())
+def getUserByName(name):
+    user=None
+    for u in REGISTER_USERS:
+        if u.name==name:
+            user=u
+    if user==None:
+        logger.debug("cant find the user!")
+    return user
+
+def getUserByID(userID):
+    user=None
+    for u in REGISTER_USERS:
+        if u.ID==userID:
+            user=u
+    if user==None:
+        logger.debug("cant find the user! with ID:"+str(userID))
+    return user
+
+def getUsersByName(name):
+    users=[]
+    for u in REGISTER_USERS:
+        if u.name==name:
+            users.append(u)
+    if len(user)==0:
+        logger.debug("cant find the user!")
+    return users
+def createUserByJson(j):
+    #dj=json.dumps(j)
+    djj=json.loads(j)
+    print djj[0].keys()
+    return createNewUser(djj[0][u"name"],djj[0][u"ID"],djj[0][u"online"])
+
+# obj=[1231,4124,24,{"sadasd":2112,"222":False}]
+# print json.dumps(obj)
+#
+# s = json.loads('{"name":"test", "type":{"name":"seq", "parameter":["1", "2"]}}')
+# print s
+# print s.keys()
+# createUserByJson(User().toJson())

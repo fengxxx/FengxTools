@@ -3,7 +3,7 @@
 import sys
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
-import logging,os
+import logging,os,json
 
 # main value
 SERVER=None
@@ -24,6 +24,9 @@ class CMD_NETWORK_HAND():
     regist="regist"
     login="login"
     msg="msg"
+    fileStart="fileStart"
+    fileEnd="fileEnd"
+    addUser="addUser"
 
 #--filePath
 PATH_SETTINGS="config.xml"
@@ -68,6 +71,7 @@ logging.getLogger('').addHandler(console)
 logger = logging.getLogger(SERVER_NAME)
 
 class User():
+    ''' user info!!!'''
     ID=-1
     name="USER_NAME"
     __password="fengx"
@@ -77,21 +81,34 @@ class User():
     logger = logging.getLogger('RhinoServers')
     def __init__( self):
         global NEXT_USER_ID
+        self.ID=NEXT_USER_ID
         NEXT_USER_ID+=1
-    def __new__(self,*args, **kwargs):
-        NEXT_USER_ID+=1
+        self.asdasdasd=1312
+    def __dict__(self):
+        return {"ID":self.ID,"sdasd":histroy}
+    def __str__(self):
+        return "sdasfmalskfmlas"
+    # def __new__(self,*args, **kwargs):
+    #     NEXT_USER_ID+=1
+    #
     def setUserName(self,n):
         self.userName==n
+
     def setPassword(self,p):
-        self.__password==n
+        self.__password==p
+
     def sendMsg(self,msg):
-        if SRH!=None:
+        if self.SRH!=None:
             logger.warning("cant send msg , is not connectting")
-    def isPassword(psw):
+
+    def isPassword(self,psw):
         res=False
-        if psw==__password:
+        if psw==self.__password:
             res=True
         return res
+    def toJson(self):
+        d=[{u"name":self.name,u"ID":self.ID,u"online":self.online}]
+        return json.dumps(d)
 def createNewUser(name):
     u=User()
     u.name=name
@@ -136,6 +153,7 @@ def login(name,password):
             msg="login succed!"
             suc=True
     return suc,u,msg
+
 def regist(name,password):
     regMsg=""
     suc=False
@@ -149,6 +167,30 @@ def regist(name,password):
     else:
         regMsg="the userName is exist!"
     return suc,u,regMsg
+
+def object2dict(obj):
+    #convert object to a dict
+    d = {}
+    d['__class__'] = obj.__class__.__name__
+    d['__module__'] = obj.__module__
+    d.update(obj.__dict__)
+    print obj.__dict__
+    return d
+
+def dict2object(d):
+    #convert dict to object
+    if'__class__' in d:
+        class_name = d.pop('__class__')
+        module_name = d.pop('__module__')
+        module = __import__(module_name)
+        class_ = getattr(module,class_name)
+        args = dict((key.encode('ascii'), value) for key, value in d.items()) #get args
+        print args
+        inst = class_() #create new instance
+    else:
+        inst = d
+    return inst
+
 
 @classmethod
 def test():
@@ -171,3 +213,13 @@ if __name__ == '__main__':
         REGISTER_USERS.append(createNewUser(str(i)))
     for u in REGISTER_USERS:
         print u.name,u.ID
+
+    #print dir(REGISTER_USERS[1])
+    #print REGISTER_USERS[1].__dict__
+    data_j= str(REGISTER_USERS[1].toJson())
+    # print data_j
+    j= json.dumps(data_j,sort_keys=True,indent=4)
+    print j
+    print data_j
+    a=json.loads(data_j)
+    print a

@@ -17,6 +17,8 @@ class Client():
     isRegist=False
     isLogin=False
     canVerify=False
+    recvByteSize=1025
+    strData={}
     def __init__(self,host,port):
         self.HOST=host
         self.PORT=port
@@ -31,7 +33,7 @@ class Client():
         pub.subscribe(self.sayWord, "sayWord")
     def run(self):
         while True:
-            data=self.TCP_Sock.recv(1024)
+            data=self.TCP_Sock.recv(self.recvByteSize)
             if data!="" and data!=None:
                 self.onNetworkRecv(data)
     def sendMsgToServer(self,msg):
@@ -59,10 +61,40 @@ class Client():
                     if ds[0]==CMDN.say:
                         if len(ds)==2:
                             wx.CallAfter(pub.sendMessage , "getMsg",m=ds[1])
+                            c=0
+                            for r in Data.FRENDES:
+                                print r.name
+                                print r.ID
+                                print c
+                                c+=1
                         else:
                             print "say what?"
+                    elif ds[0]==CMDN.fileStart:
+                        if len(ds)==2:
+                            self.recvByteSize=int(ds[1])
+                        else:
+                            print "say what?"
+                    elif ds[0]==CMDN.fileEnd:
+                        if len(ds)==3:
+                            self.strData[ds[1]]=ds[2]
+                            print "ds[1]",ds[1]
+                            print "ds[2]",ds[2]
+                            self.recvByteSize=1025
+                            print self.strData[ds[1]]
+                    elif ds[0]==CMDN.addUser:
+                        #// createUser
+                        #------
+                        print "add user:",ds[1]
+                        print "self.strData",self.strData
+                        print "self.strData[addUser]",self.strData["addUser"]
+                        Data.FRENDES.append(self.addFrendFromJson(self.strData["addUser"]))
+
                     else:
                         ()#...
+    def addFrendFromJson(self,j):
+        print "addFrendFromJson:",j
+        u=Data.createUserByJson(j)
+        return u
     def login(self,name,password):
         cmd=self.CMDN.login+Data.CMD_SPLIT+name+Data.CMD_SPLIT+password
         self.TCP_Sock.send(cmd)
